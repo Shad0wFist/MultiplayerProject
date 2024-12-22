@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/ServerScene.unity
     guid: 69dd41bb985d7b045a5d83fc7a5cd30f
   - enabled: 0
-    path: Assets/StarterAssets/FirstPersonController/Scenes/Server.unity
+    path: Assets/Scenes/Server.unity
     guid: 6e9916b487260de478345ed1e2641a7b
   - enabled: 1
     path: Assets/Scenes/Playground.unity
