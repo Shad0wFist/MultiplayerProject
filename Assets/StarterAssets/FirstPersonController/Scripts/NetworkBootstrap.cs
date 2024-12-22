@@ -15,12 +15,6 @@ public class NetworkBootstrap : MonoBehaviour
         #endif
     }
 
-    public void StartHost()
-    {
-        Debug.Log("Хост запущен.");
-        NetworkManager.Singleton.StartHost();
-    }
-
     public void StartClient()
     {
         Debug.Log("Клиент подключён.");
