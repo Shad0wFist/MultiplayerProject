@@ -1,78 +1,52 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Добавьте эту строку
+using TMPro; // Для TextMeshPro
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
-using System.Net.Sockets;
 
 public class ConnectButton : MonoBehaviour
 {
-    [SerializeField] private Button connectButton; // Ссылка на кнопку
+    [SerializeField] private Button connectButton; // Кнопка для подключения
     [SerializeField] private NetworkManager networkManager; // Ссылка на NetworkManager
-    [SerializeField] private StateController stateController; // Ссылка на StateController
-    [SerializeField] private TextMeshProUGUI statusText;
+    [SerializeField] private TextMeshProUGUI statusText; // Текст для вывода статуса подключения
 
     private void Start()
     {
-        if (connectButton == null || networkManager == null || stateController == null)
+        if (connectButton == null || networkManager == null)
         {
             Debug.LogError("ConnectButton: Не все поля настроены в инспекторе.");
             return;
         }
 
-        connectButton.onClick.AddListener(TryConnectToServer);
+        connectButton.onClick.AddListener(ConnectToServer);
+
+        // Подписываемся на событие отключения клиента
+        networkManager.OnClientDisconnectCallback += OnClientDisconnected;
     }
 
-    private void TryConnectToServer()
+    private void ConnectToServer()
     {
         var transport = networkManager.GetComponent<UnityTransport>();
         if (transport == null)
         {
             Debug.LogError("ConnectButton: UnityTransport не найден на NetworkManager.");
+            UpdateStatus("Ошибка: транспорт не настроен.");
             return;
         }
 
         string serverAddress = transport.ConnectionData.Address;
         ushort serverPort = transport.ConnectionData.Port;
 
-        // Проверяем доступность сервера
-        if (IsServerAvailable(serverAddress, serverPort))
-        {
-            Debug.Log($"Подключение к серверу {serverAddress}:{serverPort}...");
-            networkManager.StartClient();
+        Debug.Log($"Попытка подключения к серверу {serverAddress}:{serverPort}...");
+        UpdateStatus("Попытка подключения...");
 
-            // Переключение на состояние геймплея
-            stateController.SwitchState(stateController.gamePlayState);
-            UpdateStatus("Подключено. Переключение на геймплей...");
-        }
-        else
-        {
-            Debug.Log($"Сервер {serverAddress}:{serverPort} недоступен.");
-            UpdateStatus("Сервер недоступен.");
-        }
+        networkManager.StartClient();
     }
 
-    private bool IsServerAvailable(string address, ushort port)
+    private void OnClientDisconnected(ulong clientId)
     {
-        try
-        {
-            using (var client = new TcpClient())
-            {
-                var result = client.BeginConnect(address, port, null, null);
-                bool success = result.AsyncWaitHandle.WaitOne(1000); // Таймаут 1 секунда
-                if (success)
-                {
-                    client.EndConnect(result);
-                    return true; // Сервер доступен
-                }
-            }
-        }
-        catch
-        {
-            // Игнорируем исключения, связанные с невозможностью соединения
-        }
-
-        return false; // Сервер недоступен
+        Debug.Log("Подключение не удалось или разорвано.");
+        UpdateStatus("Не удалось подключиться к серверу.");
     }
 
     private void UpdateStatus(string message)
@@ -80,6 +54,15 @@ public class ConnectButton : MonoBehaviour
         if (statusText != null)
         {
             statusText.text = message;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Отписываемся от событий, чтобы избежать ошибок
+        if (networkManager != null)
+        {
+            networkManager.OnClientDisconnectCallback -= OnClientDisconnected;
         }
     }
 }

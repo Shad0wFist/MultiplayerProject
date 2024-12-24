@@ -20,8 +20,10 @@ MonoBehaviour:
     rid: 3769954305917845612
   m_OverrideGlobalSceneList: 1
   m_Scenes:
-  - m_enabled: 1
+  - m_enabled: 0
     m_path: Assets/Scenes/Server.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/Playground.unity
   m_ScriptingDefines:
   - UNITY_SERVER
   m_PlayerSettingsYaml:
