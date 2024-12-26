@@ -98,26 +98,45 @@ namespace StarterAssets
 
 		private void Start()
 		{
-			
+			// Логируем информацию о начале работы компонента и ID игрока
+			Debug.Log($"[Start] Инициализация для игрока с ID: {NetworkManager.Singleton.LocalClientId}");
+
 			if (!IsOwner)
 			{
+				// Логируем отключение компонентов для нелокального игрока
+				Debug.Log($"[Start] Отключение ввода для нелокального игрока с ID: {NetworkObjectId}");
+
 				// Отключаем обработку ввода для нелокального игрока
 				GetComponent<StarterAssetsInputs>().enabled = false;
-				GetComponent<FirstPersonController>().enabled = false;
-				GetComponent<PlayerInput>().enabled = false;
+				Debug.Log("[Start] Компонент StarterAssetsInputs отключен");
 
+				GetComponent<FirstPersonController>().enabled = false;
+				Debug.Log("[Start] Компонент FirstPersonController отключен");
+
+				GetComponent<PlayerInput>().enabled = false;
+				Debug.Log("[Start] Компонент PlayerInput отключен");
 			}
+
 			_controller = GetComponent<CharacterController>();
+			Debug.Log($"[Start] Компонент CharacterController найден: {_controller != null}");
+
 			_input = GetComponent<StarterAssetsInputs>();
+			Debug.Log($"[Start] Компонент StarterAssetsInputs найден: {_input != null}");
+
 #if ENABLE_INPUT_SYSTEM
-			_playerInput = GetComponent<PlayerInput>();
+    _playerInput = GetComponent<PlayerInput>();
+    Debug.Log($"[Start] Компонент PlayerInput найден: {_playerInput != null}");
 #else
-			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
+			Debug.LogError("[Start] Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
 
-			// reset our timeouts on start
+			// Логируем сброс тайм-аутов
+			Debug.Log("[Start] Сброс тайм-аутов прыжка и падения");
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
+
+			// Логируем завершение работы метода Start
+			Debug.Log($"[Start] Инициализация для игрока с ID: {NetworkObjectId} завершена");
 		}
 
 		private void Update()
